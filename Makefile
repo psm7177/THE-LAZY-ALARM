@@ -5,7 +5,7 @@ INCLUDE = -Iinclude/
 SRC_DIR := ./src
 OBJ_DIR := ./obj
 BIN_DIR := ./bin
-INC_DIRS := -I./include/server -I./include/server -I./include/common
+INC_DIRS := -I./include/server -I./include/command -I./include/common
 
 $(shell mkdir -p $(OBJ_DIR)/common $(OBJ_DIR)/server $(OBJ_DIR)/command)
 $(shell mkdir -p $(BIN_DIR))
