@@ -15,7 +15,7 @@
 #define OPTION_VOLUME 0b011
 #define OPTION_REPEAT 0b100
 
-#define PAYLOAD_SIZE 64
+#define PAYLOAD_SIZE 128
 #define REQUEST_SIZE sizeof(request_t)
 
 typedef struct _request request_t;
@@ -23,10 +23,11 @@ typedef struct _request request_t;
 struct _request{
     uint8_t method;
     uint8_t id;
-    uint8_t option;
+    uint8_t option[5];
     char body[PAYLOAD_SIZE];
 };
 
-size_t create_request(request_t *req,  uint8_t method, uint8_t id, uint8_t option);
+size_t create_request(request_t *req,  uint8_t method, uint8_t id);
 
-void serialize_time(request_t *req, char * str_time);
+void serialize_time(request_t *req, int hours, int minutes);
+void deserialized_time(request_t *req, int *hours, int *minutes);
