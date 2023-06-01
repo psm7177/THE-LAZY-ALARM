@@ -1,4 +1,5 @@
 #include <mission.h>
+#include <string.h>
 
 mission_t *create_mission(char *name, int difficulty)
 {
@@ -17,7 +18,7 @@ void press_buttons(int difficulty)
     printf("Mission: Press enter for n times and type 'done' command\n\n");
     printf("Caution! You should press correct number of times and type 'done' command if you are done\n-------------------------------------\n");
 
-    char *answer;
+    char answer[16];
     int count;
     int trial = 1;
     int a;
@@ -59,7 +60,7 @@ void solve_equation(int difficulty)
     printf("Mission: Solve an equation\n\n");
     printf("Caution! You should use the correct format of math symbols\n-------------------------------------\n");
 
-    char *response;
+    char response[64];
     char *answer;
     int count = 0;
 

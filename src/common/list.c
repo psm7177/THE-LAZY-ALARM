@@ -1,4 +1,4 @@
-#include "list.h"
+#include <list.h>
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -47,7 +47,7 @@ void *access_item(list_t *list, size_t index) {
         exit(1);
     }
     
-    if (index > list->num - 1 || index < 0)
+    if (index >= list->num)
     {
         fprintf(stderr, "Index error\n");
         exit(1);
@@ -81,7 +81,7 @@ void *pop_item(list_t *list) {
     return last;
 };
 
-int main() {
+int test_list() {
     list_t *a = create_list(4);
     int b = 2;
     int *item = &b;
@@ -92,4 +92,5 @@ int main() {
     int *result = access_item(a, 1);
 
     printf("%i\n", *result);
+    return 0;
 }

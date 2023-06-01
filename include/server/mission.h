@@ -3,8 +3,6 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <math.h>
-#include <list.h>
 
 typedef struct _mission mission_t;
 
