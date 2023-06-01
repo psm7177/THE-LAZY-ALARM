@@ -7,7 +7,7 @@
 #define CREATE 0b00
 #define GET 0b01
 #define UPDATE 0b10
-#define DELETE 0b10
+#define DELETE 0b11
 
 #define OPTION_TIME 0b000
 #define OPTION_DIFFICULTY 0b001
@@ -30,3 +30,4 @@ struct _request{
 size_t create_request(request_t *req,  uint8_t method, uint8_t id, uint8_t option);
 
 void serialize_time(request_t *req, char * str_time);
+void deserialize_time(request_t *req, char * str_time);
