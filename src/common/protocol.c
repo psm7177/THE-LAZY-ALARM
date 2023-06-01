@@ -1,23 +1,30 @@
 #include <protocol.h>
 #include <stdlib.h>
-size_t create_request(request_t *req, uint8_t method, uint8_t id)
+
+size_t serialize_time(char *body, uint8_t hours, uint8_t minutes)
 {
-    memset(req, 0, REQUEST_SIZE);
-    req->method = method;
-    req->id = id;
-    return 0;
-}
-void serialize_time(request_t *req, int hours, int minutes)
-{
-    int payload[] = {hours, minutes};
-    memcpy(req->body, payload, sizeof(payload));
+    uint8_t payload[2] = {hours, minutes};
+    memcpy(body, payload, sizeof(payload));
+    return sizeof(payload);
 }
 
-void deserialized_time(request_t *req, int *hours, int *minutes)
+size_t serialize_char(char *body, uint8_t *value)
 {
-    int payload[2];
-    memcpy(payload, req->body, sizeof(payload));
+    memcpy(body, value, sizeof(uint8_t));
+    return sizeof(uint8_t);
+}
+
+size_t deserialize_time(char *body, uint8_t *hours, uint8_t *minutes)
+{
+    uint8_t payload[2];
+    memcpy(payload, body, sizeof(payload));
     *hours = payload[0];
     *minutes = payload[1];
+    return sizeof(payload);
 }
-// TODO: implement deserialize_time
+
+size_t deserialize_char(char *body, uint8_t *ret)
+{
+    memcpy(ret, body, sizeof(uint8_t));
+    return sizeof(uint8_t);
+}
