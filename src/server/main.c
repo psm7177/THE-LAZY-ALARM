@@ -8,26 +8,37 @@
 #include <sys/types.h>
 #include <unistd.h> // read(), write(), close()
 #include <pthread.h>
+#include <protocol.h>
+#include <alarm.h>
+#include <list.h>
+#include <response.h>
+#include <alarm-context.h>
+
 #define MAX 80
 #define MAX_CONNECTOINS 5
 #define PORT 8080
 #define SA struct sockaddr
+
 pthread_mutex_t connection_mutex;
 pthread_cond_t connection_condition;
+
+
 int accepted_fd;
 
-void connection_handler(int connfd, char *request_buff, char *response_buff)
+void connection_handler(int connfd, request_t *request_buff, response_t *response_buff)
 {
     while (1)
     {
-        bzero(request_buff, MAX);
+        bzero(request_buff, sizeof(request_t));
 
-        int bytes_size = recv(connfd, request_buff, MAX, 0);
+        int bytes_size = recv(connfd, request_buff, sizeof(request_t), 0);
         if (bytes_size == 0)
         {
             printf("%d fd is disconnected.\n",connfd);
             break;
         }
+        response(request_buff);
+
         memcpy(response_buff, request_buff, MAX);
         write(connfd, response_buff, MAX);
     }
@@ -35,8 +46,8 @@ void connection_handler(int connfd, char *request_buff, char *response_buff)
 void *connection_thread_handler()
 {
     int connfd;
-    char request_buff[MAX];
-    char response_buff[MAX];
+    request_t request_buff;
+    response_t response_buff;
 
     while (1)
     {
@@ -48,7 +59,7 @@ void *connection_thread_handler()
         connfd = accepted_fd;
         accepted_fd = 0;
         pthread_mutex_unlock(&connection_mutex);
-        connection_handler(connfd, request_buff, response_buff);
+        connection_handler(connfd, &request_buff, &response_buff);
     }
 }
 
@@ -60,9 +71,12 @@ int main()
     struct sockaddr_in servaddr, cli;
     pthread_t thread_pool[MAX_CONNECTOINS];
     memset(thread_pool, 0, sizeof(thread_pool));
+
     pthread_mutex_init(&connection_mutex, NULL);
     pthread_cond_init(&connection_condition, NULL);
     // socket create and verification
+
+    init_alarm_list();
 
     for (int i = 0; i < MAX_CONNECTOINS; i++)
     {

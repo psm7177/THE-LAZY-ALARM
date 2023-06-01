@@ -9,28 +9,20 @@
 #include <unistd.h> // read(), write(), close()
 #include <protocol.h>
 #include <parser.h>
+
+#include <request.h>
+
 #define MAX 80
 #define PORT 8080
 #define SA struct sockaddr
-void func(int sockfd)
+
+void func(int sockfd, request_t * req)
 {
     char buff[MAX];
-    int n;
-    for (;;) {
-        bzero(buff, sizeof(buff));
-        printf("Enter the string : ");
-        n = 0;
-        while ((buff[n++] = getchar()) != '\n')
-            ;
-        write(sockfd, buff, sizeof(buff));
-        bzero(buff, sizeof(buff));
-        read(sockfd, buff, sizeof(buff));
-        printf("From Server : %s", buff);
-        if ((strncmp(buff, "exit", 4)) == 0) {
-            printf("Client Exit...\n");
-            break;
-        }
-    }
+    bzero(buff, sizeof(buff));
+    write(sockfd, req, sizeof(request_t));
+
+    // read(sockfd, buff, sizeof(buff));
 }
  
 int main( int argc, char **argv)
@@ -40,6 +32,8 @@ int main( int argc, char **argv)
 
     parse_arg(&arg, argc, argv);
 
+    request_t * req = make_request(&arg);
+    
     int sockfd;
     struct sockaddr_in servaddr;
     
@@ -68,7 +62,7 @@ int main( int argc, char **argv)
         printf("connected to the server..\n");
  
     // function for chat
-    func(sockfd);
+    func(sockfd, req);
  
     // close the socket
     close(sockfd);
