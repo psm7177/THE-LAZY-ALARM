@@ -1,18 +1,21 @@
-#include "alarm.h"
-#include "mission.h"
-#include "music.h"
+#include <alarm.h>
+#include <mission.h>
+#include <music.h>
+#include <stdint.h>
 
-alarm_t *create_alarm(uint8_t id, struct tm *target_time, list_t *mission_list, char *music, size_t volume, char *repeat_op) {
+alarm_t *create_alarm(uint8_t id, uint8_t hour, uint8_t minute) {
     alarm_t *alarm = malloc(sizeof(alarm_t));
 
     alarm->id = id;
-    alarm->target_time = target_time;
-    alarm->mission_list = mission_list;
-    alarm->music = music;
-    alarm->volume = volume;
-    alarm->repeat_op = repeat_op;
-
+    alarm->target_time.tm_hour = hour;
+    alarm->target_time.tm_min = minute;
+    alarm->mission_list = create_list(sizeof(mission_t));
+    alarm->num_music = 0;
+    // alarm->music = music;
+    alarm->volume = VOLUME_MAX;
+    // alarm->repeat_op = repeat_op;
     alarm->active = 0;
+
     return alarm;
 };
 
@@ -49,13 +52,14 @@ time_t time_check(list_t *alarm_list) {
     for (size_t i = 0; i < alarm_list->num; i++)
     {
         alarm_t *alarm = access_item(alarm_list, i);
-        if (alarm->target_time->tm_hour == timeinfo->tm_hour && alarm->target_time->tm_min == timeinfo->tm_min)
+        if (alarm->target_time.tm_hour == timeinfo->tm_hour && alarm->target_time.tm_min == timeinfo->tm_min)
         {
             start_alarm(alarm);
         }
     }
 
     syncronize();
+    return curr;
 }
 
 void start_alarm(alarm_t *alarm) {
@@ -70,12 +74,12 @@ void start_alarm(alarm_t *alarm) {
     turn_off_music();
 }
 
-int test() {
+int test_alarm() {
     time_t curr;
     struct tm* target_time = localtime(&curr);
     list_t *mission_list = create_list(sizeof(mission_t));
-    alarm_t *a = create_alarm(123, target_time, mission_list, "music.wav", 10, "every monday");
-    alarm_t *b = create_alarm(121, target_time, mission_list, "music.wav", 5, "every tuesday");
+    alarm_t *a = create_alarm(123, target_time->tm_hour, target_time->tm_min);
+    alarm_t *b = create_alarm(121, target_time->tm_hour, target_time->tm_min);
 
     list_t *alarm_list = create_list(sizeof(alarm_t));
     push_item(alarm_list, a);
@@ -91,4 +95,5 @@ int test() {
         time_check(alarm_list);
         wait(60);
     }
+    return 0;
 }
