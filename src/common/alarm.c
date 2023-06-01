@@ -13,6 +13,7 @@ alarm_t *create_alarm(uint8_t id, struct tm *target_time, list_t *mission_list, 
     alarm->repeat_op = repeat_op;
 
     alarm->active = 0;
+    return alarm;
 };
 
 void delete_alarm(alarm_t *alarm) {
@@ -69,7 +70,7 @@ void start_alarm(alarm_t *alarm) {
     turn_off_music();
 }
 
-int main() {
+int test() {
     time_t curr;
     struct tm* target_time = localtime(&curr);
     list_t *mission_list = create_list(sizeof(mission_t));

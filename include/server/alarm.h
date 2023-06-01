@@ -1,8 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
-#include "protocol.h"
-#include "list.h"
+#include <protocol.h>
+#include <list.h>
 
 //음악재생, 음악 리스트, 음악 고르기, 음악 몇 회 재생
 
