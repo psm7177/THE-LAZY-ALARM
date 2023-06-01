@@ -1,3 +1,5 @@
+#ifndef _ALARM
+#define _ALARM
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
@@ -37,3 +39,4 @@ void syncronize();
 time_t time_check(list_t *alarm_list);
 
 void start_alarm(alarm_t *alarm);
+#endif
