@@ -7,7 +7,7 @@
 #define CREATE 0b00
 #define GET 0b01
 #define UPDATE 0b10
-#define DELETE 0b10
+#define DELETE 0b11
 
 #define OPTION_TIME 0b000
 #define OPTION_DIFFICULTY 0b001
