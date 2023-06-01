@@ -8,6 +8,7 @@
 #include <sys/socket.h>
 #include <unistd.h> // read(), write(), close()
 #include <protocol.h>
+#include <parser.h>
 #define MAX 80
 #define PORT 8080
 #define SA struct sockaddr
@@ -32,8 +33,13 @@ void func(int sockfd)
     }
 }
  
-int main()
+int main( int argc, char **argv)
 {
+    
+    arg_t arg;
+
+    parse_arg(&arg, argc, argv);
+
     int sockfd;
     struct sockaddr_in servaddr;
     
