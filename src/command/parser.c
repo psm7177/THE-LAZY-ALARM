@@ -8,7 +8,8 @@
 #include <protocol.h>
 
 uint8_t parse_option(char *str);
-uint8_t parse_int(char* str);
+uint8_t parse_int(char *str);
+void parser_duplicated_option_exception(uint8_t option);
 
 void parse_arg(arg_t *arg, int argc, char **argv)
 {
@@ -35,44 +36,32 @@ void parse_create(arg_t *arg, int argc, char **argv)
     for (int i = 3; i < argc; i += 2)
     {
         uint8_t option = parse_option(argv[i]);
-        switch (option)
+        uint8_t end;
+        for (int j = 0; j < arg->num_options; j++)
         {
-        case OPTION_DIFFICULTY:
-            if(arg->is_difficulty) {
-                fprintf(stderr, "difficulty option are duplicated.\n");
+            if (option == arg->options[j].type)
+            {
+                parser_duplicated_option_exception(option);
+            }
+        }
+        switch(option)
+        {
+            case OPTION_TIME:
+                fprintf(stderr, "time option is not supported with create method.\n");
                 exit(1);
-            }
-            arg->is_difficulty = true;
-            arg->difficulty = parse_int(argv[i + 1]);
-            break;
-        case OPTION_MUSIC:
-            if(arg->is_music){
-                fprintf(stderr,"music options are duplicated.\n");
-                exit(1);
-            }
-            arg->is_music = true;
-            arg->music = parse_int(argv[i + 1]);
-            break;
-        case OPTION_REPEAT:
-            if(arg->is_repeat){
-                fprintf(stderr, "repeat options are duplicated.\n");
-                exit(1);
-            }
-            arg->is_repeat = true;
-            arg->repeat = parse_int(argv[i + 1]);
-            break;
-        case OPTION_VOLUME:
-            if(arg->is_volume){
-                fprintf(stderr, "volume options are duplicated.\n");
-            }
-            arg->is_volume = true;
-            arg->volume = parse_int(argv[i + 1]);
-            break;
-        case OPTION_TIME:
-            fprintf(stderr, "time option is not supported with create method.\n");
-            exit(1);
-        default:
-            break;
+                break;
+            case OPTION_DIFFICULTY:
+            case OPTION_MUSIC:
+            case OPTION_REPEAT:
+            case OPTION_VOLUME:
+                end = arg->num_options;
+                arg->options[end].type = option;
+                *(arg->options[end].value) = parse_int(argv[i + 1]);
+                arg->num_options++;
+                break;
+            default:
+                fprintf(stderr,"Not Implemented %d\n",option);
+                break;
         }
     }
 }
@@ -119,12 +108,14 @@ uint8_t parse_option(char *str)
     }
 }
 
-uint8_t parse_int(char* str)
+uint8_t parse_int(char *str)
 {
-    char * end;
-    uint8_t value = (uint8_t)strtol(str, &end, 10); 
-    if (end == str || *end != '\0'){
+    char *end;
+    uint8_t value = (uint8_t)strtol(str, &end, 10);
+    if (end == str || *end != '\0')
+    {
         fprintf(stderr, "%s is only inteager.\n", str);
+        exit(1);
     }
     return value;
 }
@@ -140,3 +131,29 @@ void parse_time(char *str, uint8_t *hours, uint8_t *minutes)
     *hours = result.tm_hour;
     *minutes = result.tm_min;
 }
+
+void parser_duplicated_option_exception(uint8_t option)
+{
+    char *error_option;
+    switch (option)
+    {
+    case OPTION_DIFFICULTY:
+                error_option = "difficulty";
+                break;
+            case OPTION_MUSIC:
+                error_option = "music";
+                break;
+            case OPTION_REPEAT:
+                error_option = "repeat";
+                break;
+            case OPTION_VOLUME:
+                error_option = "volume";
+                break;
+            case OPTION_TIME:
+                error_option = "time";
+            default:
+                break;
+            }
+            fprintf(stderr, "%s option are duplicated.\n", error_option);
+            exit(1);
+    }
