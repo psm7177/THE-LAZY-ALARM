@@ -22,7 +22,6 @@
 pthread_mutex_t connection_mutex;
 pthread_cond_t connection_condition;
 
-
 int accepted_fd;
 
 void connection_handler(int connfd, request_t *request_buff, response_t *response_buff)
@@ -34,13 +33,12 @@ void connection_handler(int connfd, request_t *request_buff, response_t *respons
         int bytes_size = recv(connfd, request_buff, sizeof(request_t), 0);
         if (bytes_size == 0)
         {
-            printf("%d fd is disconnected.\n",connfd);
+            printf("%d fd is disconnected.\n", connfd);
             break;
         }
-        response(request_buff);
+        response(request_buff, response_buff);
 
-        memcpy(response_buff, request_buff, MAX);
-        write(connfd, response_buff, MAX);
+        send(connfd, response_buff, sizeof(response_t), 0);
     }
 }
 void *connection_thread_handler()

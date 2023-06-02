@@ -5,10 +5,14 @@ request_t* make_request(arg_t * arg){
     request_t * req = calloc(1,sizeof(request_t));
 
     char* cur = req->body;
+    req->method = arg->method;
     switch (arg->method)
     {
     case CREATE:
         cur += serialize_time(cur, arg->hours, arg->minutes);
+        break;
+    case GET:
+        cur += serialize_char(cur, &arg->id);
         break;
     default:
         break;
@@ -19,6 +23,9 @@ request_t* make_request(arg_t * arg){
         req->options[i] = option.type;
         switch (option.type)
         {
+        case OPTION_ALL:
+            cur += 1;
+            break;
         case OPTION_DIFFICULTY:
         case OPTION_MUSIC:
         case OPTION_REPEAT:

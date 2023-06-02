@@ -9,6 +9,11 @@
 
 uint8_t parse_option(char *str);
 uint8_t parse_int(char *str);
+
+void parse_create(arg_t *arg, int argc, char **argv);
+void parse_get(arg_t *arg, int argc, char **argv);
+
+bool is_str_int(char *str);
 void parser_duplicated_option_exception(uint8_t option);
 
 void parse_arg(arg_t *arg, int argc, char **argv)
@@ -19,6 +24,9 @@ void parse_arg(arg_t *arg, int argc, char **argv)
     {
     case COMMAND_CREATE:
         parse_create(arg, argc, argv);
+        break;
+    case COMMAND_GET:
+        parse_get(arg, argc, argv);
         break;
     default:
         break;
@@ -33,7 +41,7 @@ void parse_create(arg_t *arg, int argc, char **argv)
         exit(1);
     }
     parse_time(argv[2], &arg->hours, &arg->minutes);
-    for (int i = 3; i < argc; i += 2)
+    for (int i = 3; i < argc; i += 1)
     {
         uint8_t option = parse_option(argv[i]);
         uint8_t end;
@@ -44,24 +52,82 @@ void parse_create(arg_t *arg, int argc, char **argv)
                 parser_duplicated_option_exception(option);
             }
         }
-        switch(option)
+        switch (option)
         {
-            case OPTION_TIME:
-                fprintf(stderr, "time option is not supported with create method.\n");
-                exit(1);
-                break;
-            case OPTION_DIFFICULTY:
-            case OPTION_MUSIC:
-            case OPTION_REPEAT:
-            case OPTION_VOLUME:
-                end = arg->num_options;
-                arg->options[end].type = option;
-                *(arg->options[end].value) = parse_int(argv[i + 1]);
-                arg->num_options++;
-                break;
-            default:
-                fprintf(stderr,"Not Implemented %d\n",option);
-                break;
+        case OPTION_TIME:
+            fprintf(stderr, "time option is not supported with create method.\n");
+            exit(1);
+            break;
+        case OPTION_DIFFICULTY:
+        case OPTION_MUSIC:
+        case OPTION_REPEAT:
+        case OPTION_VOLUME:
+            end = arg->num_options;
+            arg->options[end].type = option;
+            *(arg->options[end].value) = parse_int(argv[i + 1]);
+            arg->num_options++;
+            i+= 1;
+            break;
+        case OPTION_ALL:
+            fprintf(stderr, "%s is supported.\n", argv[2]);
+            exit(1);
+        default:
+            fprintf(stderr, "Not Implemented %d\n", option);
+            break;
+        }
+    }
+}
+
+void parse_get(arg_t *arg, int argc, char **argv)
+{
+    if (argc < 3)
+    {
+        arg->id = 255;
+        arg->num_options = 1;
+        arg->options->type = OPTION_ALL;
+        return;
+    }
+    if (is_str_int(argv[2]))
+    {
+        arg->id = parse_int(argv[2]);
+        return;
+    }
+    for (int i = 2; i < argc; i += 1)
+    {
+        uint8_t option = parse_option(argv[i]);
+        uint8_t end;
+        for (int j = 0; j < arg->num_options; j++)
+        {
+            if (option == arg->options[j].type)
+            {
+                parser_duplicated_option_exception(option);
+            }
+        }
+        switch (option)
+        {
+        case OPTION_TIME:
+            fprintf(stderr, "time option is not supported with get method.\n");
+            exit(1);
+        case OPTION_DIFFICULTY:
+            fprintf(stderr, "difficulty option is not supported with get method.\n");
+            exit(1);
+        case OPTION_REPEAT:
+            fprintf(stderr, "repeat option is not supported with get method.\n");
+            exit(1);
+        case OPTION_VOLUME:
+            fprintf(stderr, "volume option is not supported with get method.\n");
+            exit(1);
+        case OPTION_MUSIC:
+            fprintf(stderr, "Not Implemented %s in get method.\n", argv[i]);
+            exit(1);
+        case OPTION_ALL:
+            end = arg->num_options;
+            arg->options[end].type = option;
+            arg->num_options++;
+            break;
+        default:
+            fprintf(stderr, "Not Implemented %d\n", option);
+            break;
         }
     }
 }
@@ -72,9 +138,13 @@ uint8_t parse_method(char *str)
     {
         return COMMAND_CREATE;
     }
+    else if (strcmp(str, "get") == 0)
+    {
+        return COMMAND_GET;
+    }
     else
     {
-        fprintf(stderr, "%s is not supported command.\n", str);
+        fprintf(stderr, "%s is not supported method.\n", str);
         exit(1);
     }
 }
@@ -85,27 +155,38 @@ uint8_t parse_option(char *str)
     {
         return OPTION_DIFFICULTY;
     }
-    else if (strcmp(str, "-m"))
+    else if (strcmp(str, "-m") == 0)
     {
         return OPTION_MUSIC;
     }
-    else if (strcmp(str, "-v"))
+    else if (strcmp(str, "-v") == 0)
     {
         return OPTION_VOLUME;
     }
-    else if (strcmp(str, "-r"))
+    else if (strcmp(str, "-r") == 0)
     {
         return OPTION_REPEAT;
     }
-    else if (strcmp(str, "-t"))
+    else if (strcmp(str, "-t") == 0)
     {
         return OPTION_TIME;
+    }
+    else if (strcmp(str, "-a") == 0)
+    {
+        return OPTION_ALL;
     }
     else
     {
         fprintf(stderr, "%s is not supported option.\n", str);
         exit(1);
     }
+}
+
+bool is_str_int(char *str)
+{
+    char *end;
+    strtol(str, &end, 10);
+    return end != str && *end == '\0';
 }
 
 uint8_t parse_int(char *str)
@@ -138,22 +219,22 @@ void parser_duplicated_option_exception(uint8_t option)
     switch (option)
     {
     case OPTION_DIFFICULTY:
-                error_option = "difficulty";
-                break;
-            case OPTION_MUSIC:
-                error_option = "music";
-                break;
-            case OPTION_REPEAT:
-                error_option = "repeat";
-                break;
-            case OPTION_VOLUME:
-                error_option = "volume";
-                break;
-            case OPTION_TIME:
-                error_option = "time";
-            default:
-                break;
-            }
-            fprintf(stderr, "%s option are duplicated.\n", error_option);
-            exit(1);
+        error_option = "difficulty";
+        break;
+    case OPTION_MUSIC:
+        error_option = "music";
+        break;
+    case OPTION_REPEAT:
+        error_option = "repeat";
+        break;
+    case OPTION_VOLUME:
+        error_option = "volume";
+        break;
+    case OPTION_TIME:
+        error_option = "time";
+    default:
+        break;
     }
+    fprintf(stderr, "%s option are duplicated.\n", error_option);
+    exit(1);
+}
