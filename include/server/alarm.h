@@ -36,8 +36,8 @@ struct _alarm
 alarm_t *create_alarm(uint8_t id, uint8_t hour, uint8_t minute);
 void delete_alarm(alarm_t *alarm);
 
-void turn_on(alarm_t *alarm);
-void turn_off(alarm_t *alarm);
+// void turn_on(alarm_t *alarm);
+// void turn_off(alarm_t *alarm);
 void syncronize();
 
 time_t time_check(list_t *alarm_list);
