@@ -36,7 +36,6 @@ void response(request_t *req, response_t *res)
 
 void response_create(request_t *req, response_t *res)
 {
-    printf("create\n");
     uint8_t hour;
     uint8_t minute;
 
@@ -74,6 +73,7 @@ void response_create(request_t *req, response_t *res)
     pthread_mutex_lock(&alarm_mutex);
     push_item(alarm_list, alarm);
     pthread_mutex_unlock(&alarm_mutex);
+    free(alarm);
 }
 
 void response_get(request_t *req, response_t *res)
