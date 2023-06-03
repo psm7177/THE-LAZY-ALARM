@@ -14,6 +14,9 @@ request_t* make_request(arg_t * arg){
     case GET:
         cur += serialize_char(cur, &arg->id);
         break;
+    case DELETE:
+        cur += serialize_char(cur,&arg->id);
+        break;
     default:
         break;
     }

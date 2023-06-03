@@ -5,6 +5,7 @@
 
 #define COMMAND_CREATE CREATE
 #define COMMAND_GET GET
+#define COMMAND_DELETE DELETE
 
 typedef struct _arg arg_t;
 typedef struct _option option_t;

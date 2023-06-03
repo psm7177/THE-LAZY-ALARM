@@ -20,9 +20,10 @@
 #define OPTION_REPEAT 0b100
 #define OPTION_ALL 0b101
 
-#define TYPE_ERROR 0b00
-#define TYPE_ALARM 0b01
-#define TYPE_MUSIC 0b11
+#define TYPE_ERROR 0b000
+#define TYPE_ALARM 0b001
+#define TYPE_MUSIC 0b011
+#define TYPE_MSG 0b100
 
 #define PAYLOAD_SIZE 1024
 #define REQUEST_SIZE sizeof(request_t)

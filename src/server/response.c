@@ -11,6 +11,8 @@ void response_get(request_t *req, response_t *res);
 void response_get_all(response_t *res);
 void response_get_alarm(response_t *res, alarm_t *p_alarm);
 
+void response_delete(request_t *req, response_t *res);
+
 char *serialize_alarm(char *cur, alarm_t *p_alarm);
 
 void response(request_t *req, response_t *res)
@@ -23,6 +25,9 @@ void response(request_t *req, response_t *res)
         break;
     case GET:
         response_get(req, res);
+        break;
+    case DELETE:
+        response_delete(req, res);
         break;
     default:
         break;
@@ -136,6 +141,66 @@ void response_get_alarm(response_t *res, alarm_t *p_alarm)
     pthread_mutex_unlock(&alarm_mutex);
 }
 
+void response_delete(request_t *req, response_t *res)
+{
+    uint8_t id;
+    char *current_body = req->body;
+    current_body += deserialize_char(current_body, &id);
+
+    char msg[64];
+    for (int i = 0; i < req->num_options; i++)
+    {
+        switch (req->options[i])
+        {
+        case OPTION_DIFFICULTY:
+        case OPTION_REPEAT:
+        case OPTION_VOLUME:
+        case OPTION_TIME:
+            sprintf(msg, "%d option is not option of get method.", req->options[i]);
+            make_error_response(res, msg);
+            break;
+        case OPTION_ALL:
+            pthread_mutex_lock(&alarm_mutex);
+            clean_alarm_list();
+            pthread_mutex_unlock(&alarm_mutex);
+            res->type = TYPE_MSG;
+            res->num_info = 0;
+            sprintf(res->body, "SUCCESS");
+            return;
+        case OPTION_MUSIC:
+            make_error_response(res, "Not Implemented response_get_music");
+            return;
+        }
+    }
+    if (id == 255)
+    {
+        make_error_response(res, "Invalid access.");
+        return;
+    }
+    pthread_mutex_lock(&alarm_mutex);
+    int32_t idx = get_alarm_index_by_id(id);
+    if (idx == -1)
+    {
+        make_error_response(res, "Alarm not found for the given ID.");
+        pthread_mutex_unlock(&alarm_mutex);
+        return;
+    }
+
+    alarm_t *p_alarm = access_item(alarm_list, idx);
+    if (p_alarm == NULL)
+    {
+        fprintf(stderr, "ASSERT p_alarm != NULL\n");
+        exit(1);
+    }
+
+    delete_item(alarm_list, idx);
+    pthread_mutex_unlock(&alarm_mutex);
+
+    res->type = TYPE_MSG;
+    res->num_info = 0;
+    sprintf(res->body, "SUCCESS");
+}
+
 char *serialize_alarm(char *cur, alarm_t *p_alarm)
 {
     uint8_t hour;
@@ -156,7 +221,6 @@ char *serialize_alarm(char *cur, alarm_t *p_alarm)
 void make_error_response(response_t *res, char *msg)
 {
     res->type = TYPE_ERROR;
-    sprintf(res->body, msg);
-    fprintf(stderr, msg);
-    fprintf(stderr, "\n");
+    strcpy(res->body, msg);
+    fprintf(stderr, "%s\n", msg);
 }

@@ -41,7 +41,7 @@ void func(int sockfd, request_t *req)
     switch (res.type)
     {
     case TYPE_ERROR:
-        fprintf(stderr, "%s\n", res.body);
+        fprintf(stderr, "ERROR: %s\n", res.body);
         exit(1);
     case TYPE_ALARM:
         printf("id\ttime\tdifficulty\tmusic_number\tvolume\trepeat\n");
@@ -57,6 +57,9 @@ void func(int sockfd, request_t *req)
             current_body += deserialize_char(current_body, &num_repeat);
             printf("%d\t%d:%d\t%d\t%d\t%d\t%d\n", id, hour, minute, difficulty, num_music, volume, num_repeat);
         }
+        break;
+    case TYPE_MSG:
+        fprintf(stdout, "%s\n", current_body);
         break;
     }
 }
