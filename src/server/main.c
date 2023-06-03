@@ -38,7 +38,12 @@ void connection_handler(int connfd, request_t *request_buff, response_t *respons
         }
         response(request_buff, response_buff);
 
-        send(connfd, response_buff, sizeof(response_t), 0);
+        bytes_size = send(connfd, response_buff, sizeof(response_t), 0);
+        if (bytes_size == 0)
+        {
+            printf("%d fd is disconnected.\n", connfd);
+            break;
+        }
     }
 }
 void *connection_thread_handler()
