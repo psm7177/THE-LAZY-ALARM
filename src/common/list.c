@@ -16,8 +16,9 @@ list_t *create_list(size_t item_size)
 
 void push_item(list_t *list, void *item)
 {
-    if (list->num == list->capacity) _double_list(list);
-    char * p = list->arr;
+    if (list->num == list->capacity)
+        _double_list(list);
+    char *p = list->arr;
     void *offset = p + list->num * list->size;
     memcpy(offset, item, list->size);
 
@@ -27,32 +28,37 @@ void push_item(list_t *list, void *item)
 void delete_item(list_t *list, size_t index)
 {
     char *backup = list->arr;
+    size_t size = list->size;
 
-    if (list->num != 0) {
-        void *backward = backup + (index + 1) * list->size;
-        void *forward = backup + index * list->size;
-        memcpy(forward, backward, list->size * (list->num - index - 1));
+    if (list->num != 0)
+    {
+        void *p_delete = backup + index * size;
+        memmove(p_delete, p_delete + size, size * (list->num - index - 1));
         list->num--;
-    } else {
+    }
+    else
+    {
         fprintf(stderr, "There is no any of item in list\n");
         exit(1);
     }
 }
 
-void *access_item(list_t *list, size_t index) {
+void *access_item(list_t *list, size_t index)
+{
 
     if (list->num == 0)
     {
         fprintf(stderr, "There is no any of item in list\n");
         exit(1);
     }
-    
+
     if (index >= list->num)
     {
         fprintf(stderr, "Index error\n");
         exit(1);
-    } else return list->arr + index * list->size;
-    
+    }
+    else
+        return list->arr + index * list->size;
 }
 
 void _double_list(list_t *list)
@@ -70,18 +76,21 @@ void _double_list(list_t *list)
         exit(1);
     }
 
-    if (backup != list->arr) memcpy(list->arr, backup, size);
+    if (backup != list->arr)
+        memcpy(list->arr, backup, size);
 
     list->capacity = double_size;
 }
 
-void *pop_item(list_t *list) {
+void *pop_item(list_t *list)
+{
     void *last = list->arr + (list->num - 1) * list->size;
     delete_item(list, list->num - 1);
     return last;
 };
 
-int test_list() {
+int test_list()
+{
     list_t *a = create_list(4);
     int b = 2;
     int *item = &b;
