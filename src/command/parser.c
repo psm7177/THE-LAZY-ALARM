@@ -12,6 +12,8 @@ uint8_t parse_int(char *str);
 
 void parse_create(arg_t *arg, int argc, char **argv);
 void parse_get(arg_t *arg, int argc, char **argv);
+void parse_delete(arg_t *arg, int argc, char **argv);
+void parse_update(arg_t *arg, int argc, char **argv);
 
 bool is_str_int(char *str);
 void parser_duplicated_option_exception(uint8_t option);
@@ -27,6 +29,12 @@ void parse_arg(arg_t *arg, int argc, char **argv)
         break;
     case COMMAND_GET:
         parse_get(arg, argc, argv);
+        break;
+    case COMMAND_DELETE:
+        parse_delete(arg, argc, argv);
+        break;
+    case COMMAND_UPDATE:
+        parse_update(arg, argc, argv);
         break;
     default:
         break;
@@ -66,7 +74,7 @@ void parse_create(arg_t *arg, int argc, char **argv)
             arg->options[end].type = option;
             *(arg->options[end].value) = parse_int(argv[i + 1]);
             arg->num_options++;
-            i+= 1;
+            i += 1;
             break;
         case OPTION_ALL:
             fprintf(stderr, "%s is supported.\n", argv[2]);
@@ -132,6 +140,101 @@ void parse_get(arg_t *arg, int argc, char **argv)
     }
 }
 
+void parse_delete(arg_t *arg, int argc, char **argv)
+{
+    if (argc < 3)
+    {
+        fprintf(stderr, "Delete method require with <id> or <-a>");
+        exit(1);
+    }
+    arg->id = 255;
+    if (is_str_int(argv[2]))
+    {
+        arg->id = parse_int(argv[2]);
+        return;
+    }
+    for (int i = 2; i < argc; i += 1)
+    {
+        uint8_t option = parse_option(argv[i]);
+        uint8_t end;
+        for (int j = 0; j < arg->num_options; j++)
+        {
+            if (option == arg->options[j].type)
+            {
+                parser_duplicated_option_exception(option);
+            }
+        }
+        switch (option)
+        {
+        case OPTION_TIME:
+            fprintf(stderr, "time option is not supported with delete method.\n");
+            exit(1);
+        case OPTION_DIFFICULTY:
+            fprintf(stderr, "difficulty option is not supported with delete method.\n");
+            exit(1);
+        case OPTION_REPEAT:
+            fprintf(stderr, "repeat option is not supported with delete method.\n");
+            exit(1);
+        case OPTION_VOLUME:
+            fprintf(stderr, "volume option is not supported with delete method.\n");
+            exit(1);
+        case OPTION_MUSIC:
+            fprintf(stderr, "music option is not supported with delete method.\n");
+            exit(1);
+        case OPTION_ALL:
+            end = arg->num_options;
+            arg->options[end].type = option;
+            arg->num_options++;
+            break;
+        default:
+            fprintf(stderr, "Not Implemented %d\n", option);
+            exit(1);
+            break;
+        }
+    }
+}
+
+void parse_update(arg_t *arg, int argc, char **argv)
+{
+    if (argc < 3)
+    {
+        fprintf(stderr, "update method require <id> and at least one option.\n");
+        exit(1);
+    }
+    arg->id = parse_int(argv[2]);
+
+    for (int i = 3; i < argc; i += 1)
+    {
+        uint8_t option = parse_option(argv[i]);
+        uint8_t end;
+        for (int j = 0; j < arg->num_options; j++)
+        {
+            if (option == arg->options[j].type)
+            {
+                parser_duplicated_option_exception(option);
+            }
+        }
+        switch (option)
+        {
+        case OPTION_TIME:
+            parse_time(argv[i + 1], &arg->hours, &arg->minutes);
+            break;
+        case OPTION_DIFFICULTY:
+        case OPTION_MUSIC:
+        case OPTION_REPEAT:
+        case OPTION_VOLUME:
+            end = arg->num_options;
+            arg->options[end].type = option;
+            *(arg->options[end].value) = parse_int(argv[i + 1]);
+            arg->num_options++;
+            break;
+        default:
+            fprintf(stderr, "Not Implemented %d\n", option);
+            break;
+        }
+    }
+}
+
 uint8_t parse_method(char *str)
 {
     if (strcmp(str, "create") == 0)
@@ -141,6 +244,10 @@ uint8_t parse_method(char *str)
     else if (strcmp(str, "get") == 0)
     {
         return COMMAND_GET;
+    }
+    else if (strcmp(str, "delete") == 0)
+    {
+        return COMMAND_DELETE;
     }
     else
     {
