@@ -105,7 +105,9 @@ void response_get(request_t *req, response_t *res)
         make_error_response(res, "invalid access.");
         return;
     }
+    pthread_mutex_lock(&alarm_mutex);
     alarm_t *p_alarm = get_alarm_by_id(id);
+    pthread_mutex_unlock(&alarm_mutex);
     if (p_alarm == NULL)
     {
         make_error_response(res, "It does not exist.");
