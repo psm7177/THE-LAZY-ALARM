@@ -198,10 +198,18 @@ void parse_update(arg_t *arg, int argc, char **argv)
 {
     if (argc < 3)
     {
-        fprintf(stderr, "update method require <id> and at least one option.\n");
+        fprintf(stderr, "update method require <id>\n");
         exit(1);
     }
-    arg->id = parse_int(argv[2]);
+    if (is_str_int(argv[2]))
+    {
+        arg->id = parse_int(argv[2]);
+    }
+    else
+    {
+        fprintf(stderr, "<id> is only integer.\n");
+        exit(1);
+    }
 
     for (int i = 3; i < argc; i += 1)
     {
@@ -227,6 +235,7 @@ void parse_update(arg_t *arg, int argc, char **argv)
             arg->options[end].type = option;
             *(arg->options[end].value) = parse_int(argv[i + 1]);
             arg->num_options++;
+            i += 1;
             break;
         default:
             fprintf(stderr, "Not Implemented %d\n", option);
@@ -248,6 +257,10 @@ uint8_t parse_method(char *str)
     else if (strcmp(str, "delete") == 0)
     {
         return COMMAND_DELETE;
+    }
+    else if (strcmp(str, "update") == 0)
+    {
+        return COMMAND_UPDATE;
     }
     else
     {
@@ -302,7 +315,7 @@ uint8_t parse_int(char *str)
     uint8_t value = (uint8_t)strtol(str, &end, 10);
     if (end == str || *end != '\0')
     {
-        fprintf(stderr, "%s is only inteager.\n", str);
+        fprintf(stderr, "%s is only integer.\n", str);
         exit(1);
     }
     return value;
