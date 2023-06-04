@@ -3,23 +3,17 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <list.h>
 
-typedef struct _mission mission_t;
+typedef void (*mission_func_t)(int difficulty);
+list_t *mission_list;
 
-struct _mission
-{
-    char *name;
-    int success;
-    int difficulty;
-};
-
-mission_t *create_mission(char *name, int difficulty);
-
+void init_mission_list();
 void press_buttons(int difficulty);
 void solve_equation(int difficulty);
-void type_dictation(int difficulty); 
+void type_dictation(int difficulty);
 void flash_sensor();
 void tag_card();
-void exe_mission(mission_t *mission);
+void exe_mission(int difficulty);
 
 #endif

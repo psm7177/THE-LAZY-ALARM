@@ -1,20 +1,18 @@
 #include <mission.h>
 #include <string.h>
+#include <list.h>
+#include <time.h>
+#include <stdlib.h>
 
-mission_t *create_mission(char *name, int difficulty)
+mission_func_t mission_arr[3] = {press_buttons, type_dictation, solve_equation};
+
+void init_mission_list()
 {
-    mission_t *mission = malloc(sizeof(mission_t));
-
-    mission->name = name;
-    mission->difficulty = difficulty;
-    mission->success = 0;
-    return mission;
 }
 
 // missions
 void press_buttons(int difficulty)
 {
-
     printf("Mission: Press enter for n times and type 'done' command\n\n");
     printf("Caution! You should press correct number of times and type 'done' command if you are done\n-------------------------------------\n");
 
@@ -30,10 +28,12 @@ repeat:
 
     while (1)
     {
-        scanf("%s", answer);
-        if (strcmp(answer, "") == 0)
+        fgets(answer, 16, stdin);
+        if (strcmp(answer, "\n") == 0)
+        {
             count++;
-        else if (strcmp(answer, "done") == 0)
+        }
+        else if (strcmp(answer, "done\n") == 0)
             break;
         else
         {
@@ -42,7 +42,7 @@ repeat:
             goto repeat;
         }
     }
-
+    printf("press: %d times", count);
     if (count != a)
     {
         printf("\n\nYou pressed wrong number of times. try again.");
@@ -74,23 +74,24 @@ void solve_equation(int difficulty)
             answer = "6";
             printf("Given equation: x - 4 = 2\n");
             printf("What is x?\n\n");
-            scanf("your answer: %s", response);
+            scanf("%s", response);
         }
         else if (difficulty == 1)
         {
             answer = "9";
             printf("Given equation: x^2 + 6x + 9 = 144\n");
             printf("What is x? (x >= -3)\n\n");
-            scanf("your answer: %s", response);
+            scanf("%s", response);
         }
         else if (difficulty == 2)
         {
             answer = "xln(x) + 6x";
             printf("Given equation: f(x) = ln(x) + 7\n");
             printf("Assume that F(x) = integral(f(x)), what is eqution of F(x)? (in this case, F(0) = 0)\n\n");
-            scanf("your answer: %s", response);
+            scanf("%s", response);
         }
 
+        printf("your answer: %s\n", response);
         if (strcmp(answer, response) == 0)
             break;
 
@@ -115,21 +116,21 @@ void type_dictation(int difficulty)
         {
             answer = "hello world";
             printf("Given sentence: %s\n", answer);
-            scanf("your answer: %s", response);
+            scanf("%[^\n]", response);
         }
         else if (difficulty == 1)
         {
             answer = "Hello world! nice to meet you.";
             printf("Given sentence: %s\n", answer);
-            scanf("your answer: %s", response);
+            scanf("%[^\n]", response);
         }
         else if (difficulty == 2)
         {
             answer = "Hello world! My name is Siheon. I'm glad to meet you! Please type this sentence correctly.";
             printf("Given sentence: %s\n", answer);
-            scanf("your answer: %s", response);
+            scanf("%[^\n]", response);
         }
-
+        printf("your answer: %s\n", response);
         if (strcmp(answer, response) == 0)
             break;
 
@@ -147,19 +148,9 @@ void tag_card()
     // TODO: implement
 }
 
-void exe_mission(mission_t *mission)
+void exe_mission(int difficulty)
 {
-
-    if (strcmp(mission->name, "press buttons") == 0)
-        press_buttons(mission->difficulty);
-    else if (strcmp(mission->name, "solve equation") == 0)
-        solve_equation(mission->difficulty);
-    else if (strcmp(mission->name, "type dictation") == 0)
-        type_dictation(mission->difficulty);
-    else if (strcmp(mission->name, "flash sensor") == 0)
-        flash_sensor(mission->difficulty);
-    else if (strcmp(mission->name, "tag card") == 0)
-        tag_card(mission->difficulty);
-
-    mission->success = 1;
+    srand(time(NULL));
+    int r = rand() % 3;
+    mission_arr[r](difficulty);
 }
