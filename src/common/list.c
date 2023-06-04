@@ -1,15 +1,16 @@
 #include <list.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <mission.h>
 
 list_t *create_list(size_t item_size)
 {
     list_t *list = malloc(sizeof(list_t));
 
-    list->size = item_size;
+    list->item_size = item_size;
     list->num = 0;
     list->capacity = 1;
-    list->arr = malloc(list->size * list->capacity);
+    list->arr = malloc(list->item_size * list->capacity);
 
     return list;
 }
@@ -17,10 +18,12 @@ list_t *create_list(size_t item_size)
 void push_item(list_t *list, void *item)
 {
     if (list->num == list->capacity)
+    {
         _double_list(list);
+    }
     char *p = list->arr;
-    void *offset = p + list->num * list->size;
-    memcpy(offset, item, list->size);
+    void *offset = p + list->num * list->item_size;
+    memcpy(offset, item, list->item_size);
 
     list->num++;
 }
@@ -28,7 +31,7 @@ void push_item(list_t *list, void *item)
 void delete_item(list_t *list, size_t index)
 {
     char *backup = list->arr;
-    size_t size = list->size;
+    size_t size = list->item_size;
 
     if (list->num != 0)
     {
@@ -58,13 +61,13 @@ void *access_item(list_t *list, size_t index)
         exit(1);
     }
     else
-        return list->arr + index * list->size;
+        return list->arr + index * list->item_size;
 }
 
 void _double_list(list_t *list)
 {
     char *backup = list->arr;
-    size_t size = list->num * list->capacity;
+    size_t size = list->num * list->item_size;
     size_t double_size = 2 * size;
 
     list->arr = (char *)realloc(list->arr, double_size);
@@ -77,14 +80,16 @@ void _double_list(list_t *list)
     }
 
     if (backup != list->arr)
+    {
         memcpy(list->arr, backup, size);
+    }
 
-    list->capacity = double_size;
+    list->capacity = 2 * list->capacity;
 }
 
 void *pop_item(list_t *list)
 {
-    void *last = list->arr + (list->num - 1) * list->size;
+    void *last = list->arr + (list->num - 1) * list->item_size;
     delete_item(list, list->num - 1);
     return last;
 };
