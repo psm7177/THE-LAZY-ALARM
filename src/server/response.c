@@ -72,8 +72,8 @@ void response_create(request_t *req, response_t *res)
 
     pthread_mutex_lock(&alarm_mutex);
     push_item(alarm_list, alarm);
+    delete_alarm(alarm);
     pthread_mutex_unlock(&alarm_mutex);
-    free(alarm);
 }
 
 void response_get(request_t *req, response_t *res)
