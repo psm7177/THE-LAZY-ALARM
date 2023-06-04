@@ -106,5 +106,6 @@ int main(int argc, char **argv)
 
     // close the socket
     close(sockfd);
+    free(req);
     return 0;
 }
