@@ -32,10 +32,5 @@ int32_t get_alarm_index_by_id(uint8_t id)
 
 void clean_alarm_list()
 {
-    for (uint32_t i = 0; i < alarm_list->num; i++)
-    {
-        alarm_t *p_alarm = access_item(alarm_list, i);
-        delete_alarm(p_alarm);
-    }
     alarm_list->num = 0;
 }
