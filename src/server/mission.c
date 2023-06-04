@@ -8,6 +8,7 @@ mission_func_t mission_arr[3] = {press_buttons, type_dictation, solve_equation};
 
 void init_mission_list()
 {
+
 }
 
 // missions
@@ -21,6 +22,7 @@ void press_buttons(int difficulty)
     int trial = 1;
     int a;
 
+    memset(answer, 0, sizeof(answer));
 repeat:
     count = 0;
     a = 1 + difficulty * 10 + rand() % 10;
@@ -63,7 +65,7 @@ void solve_equation(int difficulty)
     char response[64];
     char *answer;
     int count = 0;
-
+    memset(response, 0, sizeof(response));
     // rand() 함수로 equation을 다르게 바꾸기
 
     while (1)
@@ -108,31 +110,33 @@ void type_dictation(int difficulty)
     char response[512];
     char *answer;
     int count = 0;
-
     while (1)
     {
         count++;
         if (difficulty == 0)
         {
-            answer = "hello world";
+            answer = "hello world\n";
             printf("Given sentence: %s\n", answer);
-            scanf("%[^\n]", response);
+            fgets(response, sizeof(response),stdin);
         }
         else if (difficulty == 1)
         {
-            answer = "Hello world! nice to meet you.";
+            answer = "Hello world! nice to meet you.\n";
             printf("Given sentence: %s\n", answer);
-            scanf("%[^\n]", response);
+            fgets(response, sizeof(response),stdin);
         }
         else if (difficulty == 2)
         {
-            answer = "Hello world! My name is Siheon. I'm glad to meet you! Please type this sentence correctly.";
+            answer = "Hello world! My name is Siheon. I'm glad to meet you! Please type this sentence correctly.\n";
             printf("Given sentence: %s\n", answer);
-            scanf("%[^\n]", response);
+            fgets(response, sizeof(response),stdin);
+
         }
         printf("your answer: %s\n", response);
         if (strcmp(answer, response) == 0)
+        {
             break;
+        }
 
         printf("\n\nIncorrect senctence. Try again.\n\n");
     }
