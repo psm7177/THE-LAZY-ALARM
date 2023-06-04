@@ -66,24 +66,18 @@ void *access_item(list_t *list, size_t index)
 
 void _double_list(list_t *list)
 {
-    char *backup = list->arr;
-    size_t size = list->num * list->item_size;
+    size_t size = list->capacity * list->item_size;
     size_t double_size = 2 * size;
 
-    list->arr = (char *)realloc(list->arr, double_size);
+    char *aux = (char *)realloc(list->arr, double_size);
 
     if (list->arr == NULL)
     {
-        free(backup);
         fprintf(stderr, "Memory allocation is failed\n");
         exit(1);
     }
 
-    if (backup != list->arr)
-    {
-        memcpy(list->arr, backup, size);
-    }
-
+    list->arr = aux;
     list->capacity = 2 * list->capacity;
 }
 
