@@ -96,7 +96,7 @@ time_t time_check(list_t *alarm_list) {
     return curr;
 }
 
-void *check_alarm(void *arg) {
+void *check_alarm() {
     syncronize();
     while (1)
     {
@@ -106,7 +106,7 @@ void *check_alarm(void *arg) {
     return 0;
 }
 
-void *signal_handler(void *arg){
+void *signal_handler(){
     while (1)
     {
         pthread_mutex_lock(&alarm_sig_set.sig_mutex);

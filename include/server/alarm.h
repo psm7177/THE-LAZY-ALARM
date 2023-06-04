@@ -41,6 +41,6 @@ void delete_alarm(alarm_t *alarm);
 void syncronize();
 
 time_t time_check(list_t *alarm_list);
-void *check_alarm(void *arg);
-void *signal_handler(void *arg);
+void *check_alarm();
+void *signal_handler();
 #endif
