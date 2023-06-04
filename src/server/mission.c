@@ -8,7 +8,6 @@ mission_func_t mission_arr[3] = {press_buttons, type_dictation, solve_equation};
 
 void init_mission_list()
 {
-
 }
 
 // missions
@@ -73,27 +72,27 @@ void solve_equation(int difficulty)
         count++;
         if (difficulty == 0)
         {
-            answer = "6";
+            answer = "6\n";
             printf("Given equation: x - 4 = 2\n");
             printf("What is x?\n\n");
-            scanf("%s", response);
+            fgets(response, sizeof(response),stdin);
         }
         else if (difficulty == 1)
         {
-            answer = "9";
+            answer = "9\n";
             printf("Given equation: x^2 + 6x + 9 = 144\n");
             printf("What is x? (x >= -3)\n\n");
-            scanf("%s", response);
+            fgets(response, sizeof(response),stdin);
         }
         else if (difficulty == 2)
         {
-            answer = "xln(x) + 6x";
+            answer = "xln(x) + 6x\n";
             printf("Given equation: f(x) = ln(x) + 7\n");
             printf("Assume that F(x) = integral(f(x)), what is eqution of F(x)? (in this case, F(0) = 0)\n\n");
-            scanf("%s", response);
+            fgets(response, sizeof(response),stdin);
         }
 
-        printf("your answer: %s\n", response);
+        printf("your answer: %s", response);
         if (strcmp(answer, response) == 0)
             break;
 
