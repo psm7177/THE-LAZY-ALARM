@@ -5,17 +5,18 @@
 #include <time.h>
 #include <list.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 #define VOLUME_MAX 100
-//음악재생, 음악 리스트, 음악 고르기, 음악 몇 회 재생
+// 음악재생, 음악 리스트, 음악 고르기, 음악 몇 회 재생
 
-//반복 (매일, 월요일마다, 화요일마다 ...)
-//알람 이름
-//재생할 음악
-//음악 볼륨
-//알람 미션 리스트
-//알람 생성
-// 알람 삭제
+// 반복 (매일, 월요일마다, 화요일마다 ...)
+// 알람 이름
+// 재생할 음악
+// 음악 볼륨
+// 알람 미션 리스트
+// 알람 생성
+//  알람 삭제
 
 typedef struct _alarm alarm_t;
 
@@ -23,11 +24,10 @@ struct _alarm
 {
     uint8_t id;
     struct tm target_time;
-    list_t *mission_list;
     uint8_t difficulty;
     uint8_t num_repeat;
     uint8_t volume;
-    size_t active;
+    bool active;
     uint8_t num_music;
     char *music;
     char *repeat_op;
@@ -43,4 +43,6 @@ void syncronize();
 time_t time_check(list_t *alarm_list);
 void *check_alarm();
 void *signal_handler();
+
+void init_alarm_sig();
 #endif

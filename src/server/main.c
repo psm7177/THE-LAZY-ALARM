@@ -13,8 +13,8 @@
 #include <list.h>
 #include <response.h>
 #include <alarm-context.h>
+#include <mission.h>
 
-#define MAX 80
 #define MAX_CONNECTOINS 5
 #define PORT 8080
 #define SA struct sockaddr
@@ -72,14 +72,22 @@ int main()
     int sockfd, connfd;
     socklen_t len;
     struct sockaddr_in servaddr, cli;
+
     pthread_t thread_pool[MAX_CONNECTOINS];
+    pthread_t checking_alarm, handling;
+
     memset(thread_pool, 0, sizeof(thread_pool));
 
     pthread_mutex_init(&connection_mutex, NULL);
     pthread_cond_init(&connection_condition, NULL);
-    // socket create and verification
 
+    // socket create and verification
     init_alarm_list();
+    init_mission_list();
+    init_alarm_sig();
+
+    pthread_create(&checking_alarm, 0, &check_alarm, 0);
+    pthread_create(&handling, 0, &signal_handler, 0);
 
     for (int i = 0; i < MAX_CONNECTOINS; i++)
     {
