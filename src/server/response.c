@@ -13,6 +13,8 @@ void response_get_alarm(response_t *res, alarm_t *p_alarm);
 
 void response_delete(request_t *req, response_t *res);
 
+void response_update(request_t *req, response_t *res);
+
 char *serialize_alarm(char *cur, alarm_t *p_alarm);
 
 void response(request_t *req, response_t *res)
@@ -29,6 +31,8 @@ void response(request_t *req, response_t *res)
     case DELETE:
         response_delete(req, res);
         break;
+    case UPDATE:
+        response_update(req, res);
     default:
         break;
     }
@@ -62,7 +66,10 @@ void response_create(request_t *req, response_t *res)
             break;
         case OPTION_TIME:
             make_error_response(res, "time option is not option of create method.");
-            break;
+            return;
+        case OPTION_ALL:
+            make_error_response(res, "all option is not option of create method.");
+            return;
         }
     }
 
@@ -203,6 +210,59 @@ void response_delete(request_t *req, response_t *res)
     sprintf(res->body, "SUCCESS");
 }
 
+void response_update(request_t *req, response_t *res)
+{
+    uint8_t id;
+
+    uint8_t hour;
+    uint8_t minute;
+    char *current_body = req->body;
+    current_body += deserialize_char(current_body, &id);
+
+    if (id == 255)
+    {
+        make_error_response(res, "Invalid access.");
+        return;
+    }
+    pthread_mutex_lock(&alarm_mutex);
+    alarm_t *alarm = get_alarm_by_id(id);
+    if (alarm == NULL)
+    {
+        make_error_response(res, "Alarm not found for the given ID.");
+        pthread_mutex_unlock(&alarm_mutex);
+        return;
+    }
+
+    for (int i = 0; i < req->num_options; i++)
+    {
+        switch (req->options[i])
+        {
+        case OPTION_DIFFICULTY:
+            current_body += deserialize_char(current_body, &alarm->difficulty);
+            break;
+        case OPTION_MUSIC:
+            current_body += deserialize_char(current_body, &alarm->num_music);
+            break;
+        case OPTION_REPEAT:
+            current_body += deserialize_char(current_body, &alarm->num_repeat);
+            break;
+        case OPTION_VOLUME:
+            current_body += deserialize_char(current_body, &alarm->volume);
+            break;
+        case OPTION_TIME:
+            current_body += deserialize_time(current_body, &hour, &minute);
+            break;
+        case OPTION_ALL:
+            make_error_response(res, "all option is not option of create method.");
+            return;
+        }
+    }
+    pthread_mutex_unlock(&alarm_mutex);
+
+    res->type = TYPE_MSG;
+    res->num_info = 0;
+    sprintf(res->body, "SUCCESS");
+}
 char *serialize_alarm(char *cur, alarm_t *p_alarm)
 {
     uint8_t hour;

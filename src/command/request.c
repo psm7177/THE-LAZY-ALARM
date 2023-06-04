@@ -1,10 +1,11 @@
 #include <request.h>
 #include <stdlib.h>
 
-request_t* make_request(arg_t * arg){
-    request_t * req = calloc(1,sizeof(request_t));
+request_t *make_request(arg_t *arg)
+{
+    request_t *req = calloc(1, sizeof(request_t));
 
-    char* cur = req->body;
+    char *cur = req->body;
     req->method = arg->method;
     switch (arg->method)
     {
@@ -15,13 +16,17 @@ request_t* make_request(arg_t * arg){
         cur += serialize_char(cur, &arg->id);
         break;
     case DELETE:
-        cur += serialize_char(cur,&arg->id);
+        cur += serialize_char(cur, &arg->id);
+        break;
+    case UPDATE:
+        cur += serialize_char(cur, &arg->id);
         break;
     default:
         break;
     }
 
-    for(int i = 0; i < arg->num_options; i++){
+    for (int i = 0; i < arg->num_options; i++)
+    {
         option_t option = arg->options[i];
         req->options[i] = option.type;
         switch (option.type)
