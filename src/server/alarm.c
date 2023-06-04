@@ -36,14 +36,7 @@ alarm_t *create_alarm(uint8_t id, uint8_t hour, uint8_t minute) {
 };
 
 void delete_alarm(alarm_t *alarm) {
-    pthread_mutex_lock(&alarm_mutex);
-    for (size_t i = 0; i < alarm_list->num; i++)
-    {
-        alarm_t *tmp = (alarm_t *) access_item(alarm_list, i);
-        if (tmp->id == alarm->id) delete_item(alarm_list, i);
-    }
     free(alarm);
-    pthread_mutex_unlock(&alarm_mutex);
 }
 
 // void turn_on(alarm_t *alarm) {
