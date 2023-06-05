@@ -6,6 +6,8 @@
 #include <button.h>
 #include <signal.h>
 #include <unistd.h>
+#include <math.h>
+#include <itoa.h>
 
 mission_func_t mission_arr[3] = {press_buttons, type_dictation, solve_equation};
 
@@ -115,25 +117,29 @@ void solve_equation(int difficulty)
     printf("Caution! You should use the correct format of math symbols\n-------------------------------------\n");
 
     char response[64];
-    char *answer;
+    char *answer = malloc(sizeof(char) * 16);
     int count = 0;
     memset(response, 0, sizeof(response));
     // rand() 함수로 equation을 다르게 바꾸기
+    int c1, c2;
 
     while (1)
     {
+        c1 = 1 + rand()%9;
+        srand(time(NULL));
+        c2 = 1 + rand()%9;
         count++;
         if (difficulty == 0)
         {
-            answer = "6\n";
-            printf("Given equation: x - 4 = 2\n");
+            itoa(c1 + c2, answer, 10);
+            printf("Given equation: x - %i = %i\n", c1, c2);
             printf("What is x?\n\n");
             fgets(response, sizeof(response),stdin);
         }
         else if (difficulty == 1)
         {
-            answer = "9\n";
-            printf("Given equation: x^2 + 6x + 9 = 144\n");
+            itoa(c1 - 3, answer, 10);
+            printf("Given equation: x^2 + 6x + 9 = %i\n", (int) pow(c1, 2));
             printf("What is x? (x >= -3)\n\n");
             fgets(response, sizeof(response),stdin);
         }
