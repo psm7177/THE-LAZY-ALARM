@@ -65,7 +65,7 @@ repeat:
 // missions
 void press_buttons(int difficulty)
 {
-    printf("Mission: Press button for n times and type 'done' command\n\n");
+    printf("Mission: Press enter for n times and type 'done' command\n\n");
     printf("Caution! You should press correct number of times and type 'done' command if you are done\n-------------------------------------\n");
 
     char answer[16];
@@ -78,7 +78,7 @@ repeat:
     count = 0;
     srand(time(NULL));
     a = 1 + difficulty * 10 + rand() % 10;
-    printf("\nPress button for %i times\n\n", a);
+    printf("\nPress enter for %i times\n\n", a);
 
     while (1)
     {
