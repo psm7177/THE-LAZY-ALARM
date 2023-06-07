@@ -118,7 +118,7 @@ void *signal_handler()
         alarm_t *alarm = access_item(alarm_list, active_idx);
         play_music(alarm->music);
         exe_mission(alarm->difficulty);
-        // stop_music();
+        stop_music();
         pthread_mutex_unlock(&alarm_mutex);
     }
 }
