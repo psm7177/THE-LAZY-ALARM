@@ -8,7 +8,8 @@
 typedef void (*mission_func_t)(int difficulty);
 list_t *mission_list;
 
-void init_mission_list();
+void press_GPIO(int difficulty);
+void init_mission();
 void press_buttons(int difficulty);
 void solve_equation(int difficulty);
 void type_dictation(int difficulty);

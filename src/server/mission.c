@@ -3,19 +3,27 @@
 #include <list.h>
 #include <time.h>
 #include <stdlib.h>
-#include <button.h>
 #include <signal.h>
 #include <unistd.h>
 #include <math.h>
-#include <itoa.h>
 #include <stdint.h>
 #include <shuffle.h>
 #include <nfc.h>
+#include <pigpio.h>
 
 mission_func_t mission_arr[5] = {press_buttons, type_dictation, solve_equation, tag_card};
 
-void init_mission_list()
+int button_wait;
+
+void init_mission()
 {
+    if (gpioInitialise() < 0)
+    {
+        printf("failed\n");
+    } else {
+        gpioSetMode(21, PI_INPUT);
+        gpioSetPullUpDown(21, PI_PUD_DOWN);
+    }
 }
 
 void button_sig_handler()
@@ -23,38 +31,43 @@ void button_sig_handler()
     button_wait = 0;
 }
 
-void press_GPIO(int difficulty)
-{
-    int memfile = open("/dev/mem", O_RDWR | O_SYNC);
-    gpio = (unsigned int *)mmap(0, BLOCK_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, memfile, GPIO_BASE);
-    pin25_Mode(INPUT);
+void reverse(char *first, char *last);
+void itoa(int val, char *str, int base);
+
+void press_GPIO(int difficulty) {
+
+	gpioSetMode(21, PI_INPUT);
+    printf("sucess\n");
 
     printf("Mission: Press button for n times and wait for 5 seconds\n\n");
     printf("Caution! You should press correct number of times and type 'done' command if you are done\n-------------------------------------\n");
     int count;
     int trial = 1;
     int a;
+    srand(time(NULL));
 
-    int button_buff = 0;
+    int prev = 0;
 
 repeat:
     count = 0;
-    srand(time(NULL));
     a = 1 + difficulty * 10 + rand() % 10;
     printf("\nPress button for %i times\n\n", a);
     signal(SIGALRM, button_sig_handler);
     alarm(5);
+
     button_wait = 1;
 
     while (button_wait)
     {
-        if (button_buff == LOW && Read_pin25() == HIGH)
-        {
+        int curr = gpioRead(21);
+        if (prev == 0 && curr == 1) {
             count++;
+            printf("press\n");
             alarm(0);
             alarm(5);
         }
-        button_buff = Read_pin25();
+        usleep(300);
+        prev = curr;
     }
 
     printf("press: %d times", count);
@@ -80,11 +93,11 @@ void press_buttons(int difficulty)
     int count;
     int trial = 1;
     int a;
+    srand(time(NULL));
 
     memset(answer, 0, sizeof(answer));
 repeat:
     count = 0;
-    srand(time(NULL));
     a = 1 + difficulty * 10 + rand() % 10;
     printf("\nPress enter for %i times\n\n", a);
 
@@ -122,10 +135,11 @@ void solve_equation(int difficulty)
     printf("Mission: Solve an equation\n\n");
     printf("Caution! You should use the correct format of math symbols\n-------------------------------------\n");
 
-    char response[64];
-    char *answer = malloc(sizeof(char) * 16);
+    char response[16];
+    char answer[16];
     int count = 0;
     memset(response, 0, sizeof(response));
+
     // rand() 함수로 equation을 다르게 바꾸기
     int c1, c2;
 
@@ -137,21 +151,22 @@ void solve_equation(int difficulty)
         count++;
         if (difficulty == 0)
         {
-            itoa(c1 + c2, answer, 10);
+            sprintf(answer, "%i\n", c1 + c2);
+            printf("%s\n",answer);
             printf("Given equation: x - %i = %i\n", c1, c2);
             printf("What is x?\n\n");
             fgets(response, sizeof(response), stdin);
         }
         else if (difficulty == 1)
         {
-            itoa(c1 - 3, answer, 10);
-            printf("Given equation: x^2 + 6x + 9 = %i\n", (int)pow(c1, 2));
+            sprintf(answer, "%i\n", c1 - 3);
+            printf("Given equation: x^2 + 6x + 9 = %i\n", (int) pow(c1, 2));
             printf("What is x? (x >= -3)\n\n");
             fgets(response, sizeof(response), stdin);
         }
         else if (difficulty == 2)
         {
-            answer = "xln(x) + 6x\n";
+            strcpy(answer, "xln(x) + 6x\n");
             printf("Given equation: f(x) = ln(x) + 7\n");
             printf("Assume that F(x) = integral(f(x)), what is eqution of F(x)? (in this case, F(0) = 0)\n\n");
             fgets(response, sizeof(response), stdin);
@@ -193,7 +208,7 @@ void type_dictation(int difficulty)
         {
             answer = "Hello world! My name is Siheon. I'm glad to meet you! Please type this sentence correctly.\n";
             printf("Given sentence: %s\n", answer);
-            fgets(response, sizeof(response), stdin);
+            fgets(response, sizeof(response),stdin);
         }
         printf("your answer: %s\n", response);
         if (strcmp(answer, response) == 0)
