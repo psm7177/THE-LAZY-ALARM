@@ -19,7 +19,8 @@ int button_wait;
 
 void pin25_Mode(int mode)
 {
-    int fsel, shift, alt;
+    int fsel, shift;
+	// int alt;
 
     fsel = 2;
     shift = 15;

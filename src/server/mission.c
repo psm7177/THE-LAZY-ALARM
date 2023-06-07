@@ -7,7 +7,6 @@
 #include <signal.h>
 #include <unistd.h>
 #include <math.h>
-#include <itoa.h>
 
 mission_func_t mission_arr[3] = {press_buttons, type_dictation, solve_equation};
 
@@ -18,6 +17,9 @@ void init_mission_list()
 void button_sig_handler() {
     button_wait = 0;
 }
+
+void reverse(char *first, char *last);
+void itoa(int val, char *str, int base);
 
 void press_GPIO(int difficulty) {
     int memfile = open("/dev/mem", O_RDWR | O_SYNC);
@@ -116,10 +118,11 @@ void solve_equation(int difficulty)
     printf("Mission: Solve an equation\n\n");
     printf("Caution! You should use the correct format of math symbols\n-------------------------------------\n");
 
-    char response[64];
+    char *response = malloc(sizeof(char) * 16);
     char *answer = malloc(sizeof(char) * 16);
     int count = 0;
     memset(response, 0, sizeof(response));
+
     // rand() 함수로 equation을 다르게 바꾸기
     int c1, c2;
 
@@ -188,7 +191,6 @@ void type_dictation(int difficulty)
             answer = "Hello world! My name is Siheon. I'm glad to meet you! Please type this sentence correctly.\n";
             printf("Given sentence: %s\n", answer);
             fgets(response, sizeof(response),stdin);
-
         }
         printf("your answer: %s\n", response);
         if (strcmp(answer, response) == 0)
@@ -215,4 +217,39 @@ void exe_mission(int difficulty)
     srand(time(NULL));
     int r = rand() % 3;
     mission_arr[r](difficulty);
+}
+
+void reverse(char *first, char *last) {
+    char tmp;
+    while (last > first)
+    {
+        tmp = *last;
+        *last --= *first;
+        *first ++= tmp;
+    }
+}
+
+void itoa(int val, char *str, int base) {
+    static char idx[] = "0123456789abcdefghijklmnopqrstuvwxyz";
+    char *wstr = str;
+    int sign = (val < 0);
+    div_t res;
+
+    if (base < 2 || base > 35) {
+        *wstr = '\0';
+        return;
+    }
+    if (sign) val = -val;
+
+    do
+    {
+        res = div(val, base);
+        *wstr ++= idx[res.rem];
+    } while (val = res.quot);
+    if (sign)
+    {
+        *wstr ++= '-';
+        *wstr = '\0';
+    }
+    reverse(str, wstr - 1);
 }
