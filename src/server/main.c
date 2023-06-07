@@ -18,7 +18,7 @@
 #include <nfc.h>
 
 #define MAX_CONNECTOINS 5
-#define PORT 8080
+#define PORT 8081
 #define SA struct sockaddr
 
 pthread_mutex_t connection_mutex;
@@ -140,7 +140,8 @@ int main()
         connfd = accept(sockfd, (SA *)&cli, &len);
         if (connfd < 1)
         {
-            printf("server accpet faild... \n");
+            printf("server accpet failed... \n");
+            continue;
         }
         pthread_mutex_lock(&connection_mutex);
         accepted_fd = connfd;
