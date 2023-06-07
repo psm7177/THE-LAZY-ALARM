@@ -8,21 +8,26 @@
 #include <unistd.h>
 #include <math.h>
 #include <itoa.h>
+#include <stdint.h>
+#include <shuffle.h>
+#include <nfc.h>
 
-mission_func_t mission_arr[3] = {press_buttons, type_dictation, solve_equation};
+mission_func_t mission_arr[5] = {press_buttons, type_dictation, solve_equation, tag_card};
 
 void init_mission_list()
 {
 }
 
-void button_sig_handler() {
+void button_sig_handler()
+{
     button_wait = 0;
 }
 
-void press_GPIO(int difficulty) {
+void press_GPIO(int difficulty)
+{
     int memfile = open("/dev/mem", O_RDWR | O_SYNC);
-	gpio = (unsigned int *) mmap(0, BLOCK_SIZE, PROT_READ|PROT_WRITE, MAP_SHARED, memfile, GPIO_BASE);
-	pin25_Mode(INPUT);
+    gpio = (unsigned int *)mmap(0, BLOCK_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, memfile, GPIO_BASE);
+    pin25_Mode(INPUT);
 
     printf("Mission: Press button for n times and wait for 5 seconds\n\n");
     printf("Caution! You should press correct number of times and type 'done' command if you are done\n-------------------------------------\n");
@@ -43,7 +48,8 @@ repeat:
 
     while (button_wait)
     {
-        if (button_buff == LOW && Read_pin25() == HIGH) {
+        if (button_buff == LOW && Read_pin25() == HIGH)
+        {
             count++;
             alarm(0);
             alarm(5);
@@ -125,30 +131,30 @@ void solve_equation(int difficulty)
 
     while (1)
     {
-        c1 = 1 + rand()%9;
+        c1 = 1 + rand() % 9;
         srand(time(NULL));
-        c2 = 1 + rand()%9;
+        c2 = 1 + rand() % 9;
         count++;
         if (difficulty == 0)
         {
             itoa(c1 + c2, answer, 10);
             printf("Given equation: x - %i = %i\n", c1, c2);
             printf("What is x?\n\n");
-            fgets(response, sizeof(response),stdin);
+            fgets(response, sizeof(response), stdin);
         }
         else if (difficulty == 1)
         {
             itoa(c1 - 3, answer, 10);
-            printf("Given equation: x^2 + 6x + 9 = %i\n", (int) pow(c1, 2));
+            printf("Given equation: x^2 + 6x + 9 = %i\n", (int)pow(c1, 2));
             printf("What is x? (x >= -3)\n\n");
-            fgets(response, sizeof(response),stdin);
+            fgets(response, sizeof(response), stdin);
         }
         else if (difficulty == 2)
         {
             answer = "xln(x) + 6x\n";
             printf("Given equation: f(x) = ln(x) + 7\n");
             printf("Assume that F(x) = integral(f(x)), what is eqution of F(x)? (in this case, F(0) = 0)\n\n");
-            fgets(response, sizeof(response),stdin);
+            fgets(response, sizeof(response), stdin);
         }
 
         printf("your answer: %s", response);
@@ -175,20 +181,19 @@ void type_dictation(int difficulty)
         {
             answer = "hello world\n";
             printf("Given sentence: %s\n", answer);
-            fgets(response, sizeof(response),stdin);
+            fgets(response, sizeof(response), stdin);
         }
         else if (difficulty == 1)
         {
             answer = "Hello world! nice to meet you.\n";
             printf("Given sentence: %s\n", answer);
-            fgets(response, sizeof(response),stdin);
+            fgets(response, sizeof(response), stdin);
         }
         else if (difficulty == 2)
         {
             answer = "Hello world! My name is Siheon. I'm glad to meet you! Please type this sentence correctly.\n";
             printf("Given sentence: %s\n", answer);
-            fgets(response, sizeof(response),stdin);
-
+            fgets(response, sizeof(response), stdin);
         }
         printf("your answer: %s\n", response);
         if (strcmp(answer, response) == 0)
@@ -205,9 +210,60 @@ void flash_sensor()
 {
     // TODO: implement
 }
-void tag_card()
+void tag_card(int difficulty)
 {
-    // TODO: implement
+    int idx_arr[4] = {0, 1, 2, 3};
+    int count = difficulty + 2;
+
+    int last_id = 0;
+
+    shuffle(idx_arr, 4, sizeof(int));
+    printf("\n");
+    printf("Tag the cards in this order.\n");
+    for (int i = 0; i < count; i++)
+    {
+        printf("%d ", idx_arr[i]);
+    }
+    printf("\n");
+
+    for (int i = 0; i < count; i++)
+    {
+        while (1)
+        {
+            int idx = idx_arr[i];
+            sleep(1);
+            if (connectToCard())
+            {
+                uint8_t uidCommand[] = {0xFF, 0xca, 0x00, 0x00, 0x00};
+                unsigned short uidCommandLength = sizeof(uidCommand);
+                int cardId = sendCommand(uidCommand, uidCommandLength);
+                if (last_id == cardId)
+                {
+                    disconnectFromCard();
+                    continue;
+                }
+                else
+                {
+                    last_id = cardId;
+                }
+                if (card_arr[idx] == cardId)
+                {
+                    printf("Next\n");
+                    disconnectFromCard();
+                    break;
+                }
+                else
+                {
+                    printf("Wrong Card.\n");
+                    printf("Reset the mission\n");
+                    i = 0;
+                    last_id = 0;
+                }
+                disconnectFromCard();
+            }
+        }
+    }
+    printf("SUCCESS\n");
 }
 
 void exe_mission(int difficulty)

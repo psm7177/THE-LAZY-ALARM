@@ -13,7 +13,7 @@ void press_buttons(int difficulty);
 void solve_equation(int difficulty);
 void type_dictation(int difficulty);
 void flash_sensor();
-void tag_card();
+void tag_card(int difficulty);
 void exe_mission(int difficulty);
 
 #endif
