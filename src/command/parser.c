@@ -126,8 +126,6 @@ void parse_get(arg_t *arg, int argc, char **argv)
             fprintf(stderr, "volume option is not supported with get method.\n");
             exit(1);
         case OPTION_MUSIC:
-            fprintf(stderr, "Not Implemented %s in get method.\n", argv[i]);
-            exit(1);
         case OPTION_ALL:
             end = arg->num_options;
             arg->options[end].type = option;

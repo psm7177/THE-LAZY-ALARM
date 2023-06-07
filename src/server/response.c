@@ -4,13 +4,14 @@
 #include <pthread.h>
 #include <alarm-context.h>
 #include <protocol.h>
+#include <music.h>
 
 void response_create(request_t *req, response_t *res);
 void response_get(request_t *req, response_t *res);
 
 void response_get_all(response_t *res);
 void response_get_alarm(response_t *res, alarm_t *p_alarm);
-
+void response_get_all_music(response_t *res);
 void response_delete(request_t *req, response_t *res);
 
 void response_update(request_t *req, response_t *res);
@@ -103,7 +104,8 @@ void response_get(request_t *req, response_t *res)
             response_get_all(res);
             return;
         case OPTION_MUSIC:
-            make_error_response(res, "Not Implemented response_get_music");
+            response_get_all_music(res);
+            // make_error_response(res, "Not Implemented response_get_music");
             return;
         }
     }
@@ -139,6 +141,19 @@ void response_get_all(response_t *res)
     pthread_mutex_unlock(&alarm_mutex);
 }
 
+void response_get_all_music(response_t *res)
+{
+    res->type = TYPE_MUSIC;
+    res->num_info = music_list->num;
+    char *cur = res->body;
+    for (uint32_t i = 0; i < music_list->num; i++)
+    {
+        char *music_name = access_item(music_list, i);
+        printf("%s\n", music_name);
+        memcpy(cur, music_name, music_list->item_size);
+        cur += music_list->item_size;
+    }
+}
 void response_get_alarm(response_t *res, alarm_t *p_alarm)
 {
     res->type = TYPE_ALARM;

@@ -38,6 +38,7 @@ void func(int sockfd, request_t *req)
     uint8_t num_music;
     uint8_t volume;
     uint8_t num_repeat;
+    char music_name[32];
     switch (res.type)
     {
     case TYPE_ERROR:
@@ -60,6 +61,17 @@ void func(int sockfd, request_t *req)
         break;
     case TYPE_MSG:
         fprintf(stdout, "%s\n", current_body);
+        break;
+    case TYPE_MUSIC:
+        printf("idx\tname\n");
+        printf("total: %d\n", res.num_info);
+        printf("============================================================\n");
+        for (int i = 0; i < res.num_info; i++)
+        {
+            memcpy(music_name, current_body, 32);
+            printf("%d\t%s\n", i, music_name);
+            current_body += 32;
+        }
         break;
     }
 }
