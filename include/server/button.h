@@ -1,3 +1,5 @@
+#ifndef _BUTTON
+#define _BUTTON
 #include <stdio.h>
 #include <fcntl.h>
 #include <sys/mman.h>
@@ -35,3 +37,5 @@ int Read_pin25()
     int gpioToGPLEV=13;
 	if ((*(gpio + gpioToGPLEV) & (1 << (25 & 31))) != 0) return HIGH; else return LOW;
 }
+
+#endif
