@@ -15,6 +15,7 @@
 #include <alarm-context.h>
 #include <mission.h>
 #include <music.h>
+#include <nfc.h>
 
 #define MAX_CONNECTOINS 5
 #define PORT 8080

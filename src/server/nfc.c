@@ -127,7 +127,7 @@ void getCardInformation()
         printf("\n");
         printf("Name of the reader: %s\n", readerName);
         printf("ATR: ");
-        for (int i = 0; i < ATRLength; i++)
+        for (uint32_t i = 0; i < ATRLength; i++)
         {
             printf("%02X ", ATR[i]);
         }
