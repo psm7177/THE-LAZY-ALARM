@@ -51,6 +51,17 @@ void init_music()
     closedir(dirp);
 }
 
+void get_music_path(uint32_t idx, char *path)
+{
+    if (idx >= music_list->num)
+    {
+        fprintf(stderr, "out of range in music list.\n");
+        return;
+    }
+    char *filename = access_item(music_list, idx);
+    sprintf(path, "%s/%s", music_dir, filename);
+}
+
 void data_callback(ma_device *pDevice, void *pOutput, const void *pInput, ma_uint32 frameCount)
 {
     ma_decoder *pDecoder = (ma_decoder *)pDevice->pUserData;
@@ -67,7 +78,7 @@ void data_callback(ma_device *pDevice, void *pOutput, const void *pInput, ma_uin
 
 void play_music(char *music)
 {
-    result = ma_decoder_init_file("sample-3s.mp3", NULL, &decoder);
+    result = ma_decoder_init_file(music, NULL, &decoder);
     if (result != MA_SUCCESS)
     {
         fprintf(stderr, "Failed in initialize decoder");

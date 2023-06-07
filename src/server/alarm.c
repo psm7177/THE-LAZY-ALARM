@@ -116,7 +116,10 @@ void *signal_handler()
 
         pthread_mutex_lock(&alarm_mutex);
         alarm_t *alarm = access_item(alarm_list, active_idx);
-        play_music(alarm->music);
+
+        char music_name[64];
+        get_music_path(alarm->num_music, music_name);
+        play_music(music_name);
         exe_mission(alarm->difficulty);
         stop_music();
         pthread_mutex_unlock(&alarm_mutex);
