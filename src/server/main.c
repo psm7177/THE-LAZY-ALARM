@@ -14,6 +14,7 @@
 #include <response.h>
 #include <alarm-context.h>
 #include <mission.h>
+#include <music.h>
 
 #define MAX_CONNECTOINS 5
 #define PORT 8080
@@ -84,7 +85,7 @@ int main()
     // socket create and verification
     init_music();
     init_alarm_list();
-    init_mission_list();
+    init_mission();
     init_alarm_sig();
 
     pthread_create(&checking_alarm, 0, &check_alarm, 0);
