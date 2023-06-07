@@ -1,11 +1,11 @@
 CC = gcc-9
 CFLAGS := -Wall -Wextra -g
-INCLUDE = -Iinclude/
+INCLUDE = -Iinclude/ 
 
 SRC_DIR := ./src
 OBJ_DIR := ./obj
 BIN_DIR := ./bin
-INC_DIRS := -I./include/server -I./include/command -I./include/common
+INC_DIRS := -I./include/server -I./include/command -I./include/common -I/usr/include/PCSC
 
 $(shell mkdir -p $(OBJ_DIR)/common $(OBJ_DIR)/server $(OBJ_DIR)/command)
 $(shell mkdir -p $(BIN_DIR))
@@ -29,7 +29,7 @@ all: $(SERVER_TARGET) $(COMMAND_TARGET)
 
 # Linking
 $(SERVER_TARGET): $(COMMON_OBJS) $(SERVER_OBJS)
-	$(CC) $(CFLAGS) $(INC_DIRS) $^ ./lib/libminiaudio.a -o $@ -pthread -ldl -lpthread -lm
+	$(CC) $(CFLAGS) $(INC_DIRS) $^ ./lib/libminiaudio.a -o $@ -pthread -ldl -lpthread -lm -lpcsclite
 
 $(COMMAND_TARGET): $(COMMON_OBJS) $(COMMAND_OBJS)
 	$(CC) $(CFLAGS) $(INC_DIRS) $^ -o $@ -pthread
