@@ -82,6 +82,7 @@ int main()
     pthread_cond_init(&connection_condition, NULL);
 
     // socket create and verification
+    init_music();
     init_alarm_list();
     init_mission_list();
     init_alarm_sig();

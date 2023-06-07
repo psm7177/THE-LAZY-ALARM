@@ -34,8 +34,8 @@ request_t *make_request(arg_t *arg)
         case OPTION_ALL:
             cur += 1;
             break;
-        case OPTION_DIFFICULTY:
         case OPTION_MUSIC:
+        case OPTION_DIFFICULTY:
         case OPTION_REPEAT:
         case OPTION_VOLUME:
             cur += serialize_char(cur, option.value);
