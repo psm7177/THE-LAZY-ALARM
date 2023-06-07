@@ -12,6 +12,7 @@ mission_func_t mission_arr[3] = {press_buttons, type_dictation, solve_equation};
 
 void init_mission_list()
 {
+
 }
 
 void button_sig_handler() {
@@ -118,8 +119,8 @@ void solve_equation(int difficulty)
     printf("Mission: Solve an equation\n\n");
     printf("Caution! You should use the correct format of math symbols\n-------------------------------------\n");
 
-    char *response = malloc(sizeof(char) * 16);
-    char *answer = malloc(sizeof(char) * 16);
+    char response[16];
+    char answer[16];
     int count = 0;
     memset(response, 0, sizeof(response));
 
@@ -134,21 +135,22 @@ void solve_equation(int difficulty)
         count++;
         if (difficulty == 0)
         {
-            itoa(c1 + c2, answer, 10);
+            sprintf(answer, "%i\n", c1 + c2);
+            printf("%s\n",answer);
             printf("Given equation: x - %i = %i\n", c1, c2);
             printf("What is x?\n\n");
             fgets(response, sizeof(response),stdin);
         }
         else if (difficulty == 1)
         {
-            itoa(c1 - 3, answer, 10);
+            sprintf(answer, "%i\n", c1 - 3);
             printf("Given equation: x^2 + 6x + 9 = %i\n", (int) pow(c1, 2));
             printf("What is x? (x >= -3)\n\n");
             fgets(response, sizeof(response),stdin);
         }
         else if (difficulty == 2)
         {
-            answer = "xln(x) + 6x\n";
+            strcpy(answer, "xln(x) + 6x\n");
             printf("Given equation: f(x) = ln(x) + 7\n");
             printf("Assume that F(x) = integral(f(x)), what is eqution of F(x)? (in this case, F(0) = 0)\n\n");
             fgets(response, sizeof(response),stdin);
@@ -217,39 +219,4 @@ void exe_mission(int difficulty)
     srand(time(NULL));
     int r = rand() % 3;
     mission_arr[r](difficulty);
-}
-
-void reverse(char *first, char *last) {
-    char tmp;
-    while (last > first)
-    {
-        tmp = *last;
-        *last --= *first;
-        *first ++= tmp;
-    }
-}
-
-void itoa(int val, char *str, int base) {
-    static char idx[] = "0123456789abcdefghijklmnopqrstuvwxyz";
-    char *wstr = str;
-    int sign = (val < 0);
-    div_t res;
-
-    if (base < 2 || base > 35) {
-        *wstr = '\0';
-        return;
-    }
-    if (sign) val = -val;
-
-    do
-    {
-        res = div(val, base);
-        *wstr ++= idx[res.rem];
-    } while (val = res.quot);
-    if (sign)
-    {
-        *wstr ++= '-';
-        *wstr = '\0';
-    }
-    reverse(str, wstr - 1);
 }
