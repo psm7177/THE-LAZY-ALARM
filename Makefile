@@ -29,7 +29,7 @@ all: $(SERVER_TARGET) $(COMMAND_TARGET)
 
 # Linking
 $(SERVER_TARGET): $(COMMON_OBJS) $(SERVER_OBJS)
-	$(CC) $(CFLAGS) $(INC_DIRS) $^ ./lib/libminiaudio.a -o $@ -pthread -ldl -lpthread -lm
+	$(CC) $(CFLAGS) $(INC_DIRS) $^ ./lib/libminiaudio.a -o $@ -pthread -ldl -lpthread -lm -lpigpio
 
 $(COMMAND_TARGET): $(COMMON_OBJS) $(COMMAND_OBJS)
 	$(CC) $(CFLAGS) $(INC_DIRS) $^ -o $@ -pthread

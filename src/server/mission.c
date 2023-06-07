@@ -3,16 +3,23 @@
 #include <list.h>
 #include <time.h>
 #include <stdlib.h>
-#include <button.h>
 #include <signal.h>
 #include <unistd.h>
 #include <math.h>
+#include <pigpio.h>
 
 mission_func_t mission_arr[3] = {press_buttons, type_dictation, solve_equation};
+int button_wait;
 
-void init_mission_list()
+void init_mission()
 {
-
+    if (gpioInitialise() < 0)
+    {
+        printf("failed\n");
+    } else {
+        gpioSetMode(21, PI_INPUT);
+        gpioSetPullUpDown(21, PI_PUD_DOWN);
+    }
 }
 
 void button_sig_handler() {
@@ -23,35 +30,39 @@ void reverse(char *first, char *last);
 void itoa(int val, char *str, int base);
 
 void press_GPIO(int difficulty) {
-    int memfile = open("/dev/mem", O_RDWR | O_SYNC);
-	gpio = (unsigned int *) mmap(0, BLOCK_SIZE, PROT_READ|PROT_WRITE, MAP_SHARED, memfile, GPIO_BASE);
-	pin25_Mode(INPUT);
+
+	gpioSetMode(21, PI_INPUT);
+    printf("sucess\n");
 
     printf("Mission: Press button for n times and wait for 5 seconds\n\n");
     printf("Caution! You should press correct number of times and type 'done' command if you are done\n-------------------------------------\n");
     int count;
     int trial = 1;
     int a;
+    srand(time(NULL));
 
-    int button_buff = 0;
+    int prev = 0;
 
 repeat:
     count = 0;
-    srand(time(NULL));
     a = 1 + difficulty * 10 + rand() % 10;
     printf("\nPress button for %i times\n\n", a);
     signal(SIGALRM, button_sig_handler);
     alarm(5);
+
     button_wait = 1;
 
     while (button_wait)
     {
-        if (button_buff == LOW && Read_pin25() == HIGH) {
+        int curr = gpioRead(21);
+        if (prev == 0 && curr == 1) {
             count++;
+            printf("press\n");
             alarm(0);
             alarm(5);
         }
-        button_buff = Read_pin25();
+        usleep(300);
+        prev = curr;
     }
 
     printf("press: %d times", count);
@@ -77,11 +88,11 @@ void press_buttons(int difficulty)
     int count;
     int trial = 1;
     int a;
+    srand(time(NULL));
 
     memset(answer, 0, sizeof(answer));
 repeat:
     count = 0;
-    srand(time(NULL));
     a = 1 + difficulty * 10 + rand() % 10;
     printf("\nPress enter for %i times\n\n", a);
 
