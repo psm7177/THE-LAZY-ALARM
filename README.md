@@ -55,14 +55,14 @@ The HH indicates hours of range from 0 to 23.
 ```
 The Get command is required for one option at least. With `id`, the server responds the information of alarm that has the `id`. Using `-a`, the server returns all the alarms in  server. The `-m` option return the list of music in `./music`.
 
-### Update
+### UPDATE
 
 ```
 ./bin/command update <id> [-v volume] [-d difficulty] [-t HH:MM] [-m music_id]
 ```
 The Update command change the properties of the `id` alarm.
 
-### Delete
+### DELETE
 ```
 ./bin/command delete <id>
 ```
