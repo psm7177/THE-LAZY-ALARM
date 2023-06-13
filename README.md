@@ -4,6 +4,7 @@
 # Environement
 - Raspbian (Bullseye)
 - gcc 9.4.0
+- ARM A7-972
 
 # Prerequisite
 - NFC Reader ACR1252U
