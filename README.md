@@ -4,7 +4,6 @@
 # Environement
 - Raspbian (Bullseye)
 - gcc 9.4.0
-- 
 
 # Prerequisite
 - NFC Reader ACR1252U
