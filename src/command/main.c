@@ -14,7 +14,7 @@
 #include <request.h>
 
 #define MAX 80
-#define PORT 8080
+#define PORT 8081
 #define SA struct sockaddr
 
 void func(int sockfd, request_t *req)
